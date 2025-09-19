@@ -20,7 +20,8 @@ def update_articles(request):
     if cache.get(cache_key):
         return Response({"detail": "Данные недавно обновлялись"}, status=200)
 
-    response = requests.get(NEWS_API_URL, params={"apiKey": API_KEY})
+    headers = {"Authorization": f"Bearer {API_KEY}"}
+    response = requests.get(NEWS_API_URL, headers=headers)
     if response.status_code != 200:
         return Response({"error": "Ошибка при запросе к NewsAPI"}, status=500)
 
@@ -54,16 +55,19 @@ def list_articles(request):
         return Response(cached)
 
     qs = Article.objects.all()
-
+    filters = {}
 
     fresh = request.query_params.get("fresh")
     if fresh == "true":
         since = timezone.now() - timedelta(hours=24)
-        qs = qs.filter(published_at__gte=since)
+        filters["published_at__gte"] = since
 
     title_contains = request.query_params.get("title")
     if title_contains:
-        qs = qs.filter(title__icontains=title_contains)
+        filters["title__icontains"] = title_contains
+
+    if filters:
+        qs = qs.filter(**filters)
 
     serializer = ArticleSerializer(qs, many=True)
     result = serializer.data
