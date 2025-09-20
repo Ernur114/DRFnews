@@ -2,7 +2,7 @@
 
 ## Аутентификация / пользователи
 
-* **POST /auth/register/** — регистрация пользователя (создаётся с `is_active = false`, отправляется код активации).
+* **POST /register/** — регистрация пользователя (создаётся с `is_active = false`, отправляется код активации).
 * **POST /auth/activate/** — активация аккаунта по email и коду.
 * **POST /auth/token/** — получение JWT access/refresh токенов.
 * **POST /auth/token/refresh/** — обновление access-токена.
